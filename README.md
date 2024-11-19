@@ -50,7 +50,7 @@ PUT /trivia/reply/1
 
            Request Body
            {
-             "answer": "Chile"
+             "answer": "Chile"  <-- TVR Inconsistent
            }
 
 This endpoint will retrieve record from database given the triviaId received as input parameter.
