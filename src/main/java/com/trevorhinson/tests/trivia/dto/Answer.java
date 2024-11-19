@@ -1,5 +1,8 @@
 package com.trevorhinson.tests.trivia.dto;
 
+import lombok.Getter;
+
+@Getter
 public enum Answer {
     
     RIGHT("right!"),
@@ -7,11 +10,8 @@ public enum Answer {
     NOT_FOUND("No such question!"),
     ATTEMPTS_EXCEEDED("Max attempts reached!");
 
-    private String message;
+    private final String message;
 
-    public String getMessage() {
-        return message;
-    }
     Answer(String message) {
         this.message = message;
     }

@@ -1,6 +1,5 @@
 package com.trevorhinson.tests.trivia.controller;
 
-import com.trevorhinson.tests.trivia.dto.Answer;
 import com.trevorhinson.tests.trivia.dto.ReplyRequest;
 import com.trevorhinson.tests.trivia.dto.ReplyResponse;
 import com.trevorhinson.tests.trivia.dto.TriviaResponse;
@@ -29,7 +28,7 @@ public class TriviaController {
     @PutMapping(path = "/reply/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ReplyResponse> replyTrivia(@PathVariable Long id, @RequestBody ReplyRequest answerRequest) {
         validateId(id);
-        validateAnswerRequest(answerRequest);
+        validateReplyRequest(answerRequest);
         final ReplyResponse replyResponse = triviaService.reply(id, answerRequest);
         return applyResponse(replyResponse);
     }
@@ -56,7 +55,7 @@ public class TriviaController {
         }
     }
 
-    void validateAnswerRequest(ReplyRequest replyRequest) {
+    void validateReplyRequest(ReplyRequest replyRequest) {
         if (replyRequest == null) {
             throw new IllegalArgumentException("Reply request must include an answer.");
         }

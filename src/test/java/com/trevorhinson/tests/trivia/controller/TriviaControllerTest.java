@@ -1,6 +1,5 @@
 package com.trevorhinson.tests.trivia.controller;
 
-import com.trevorhinson.tests.trivia.dto.Answer;
 import com.trevorhinson.tests.trivia.dto.ReplyRequest;
 import com.trevorhinson.tests.trivia.dto.ReplyResponse;
 import com.trevorhinson.tests.trivia.dto.TriviaResponse;
@@ -181,12 +180,12 @@ class TriviaControllerTest {
     }
 
     @Test
-    void validateAnswerRequest_shouldThrowIllegalArgumentException_whenReplyRequestIsNull() {
+    void validateReplyRequest_shouldThrowIllegalArgumentException_whenReplyRequestIsNull() {
         // Given
         ReplyRequest nullReplyRequest = null;
 
         // When // Then
-        assertThatThrownBy(() -> underTest.validateAnswerRequest(nullReplyRequest))
+        assertThatThrownBy(() -> underTest.validateReplyRequest(nullReplyRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Reply request must include an answer.");
     }
