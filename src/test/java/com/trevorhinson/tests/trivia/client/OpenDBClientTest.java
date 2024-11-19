@@ -11,22 +11,20 @@ import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RetryOperations;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class OpenDBClientTest {
+class OpenDBClientTest {
 
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private RetryOperations retryOperations;
 
-    private String testUrl = "https://opentdb.com/api.php?amount=";
+    private final String testUrl = "https://opentdb.com/api.php?amount=";
 
     private OpenDBClient underTest;
 
@@ -37,7 +35,7 @@ public class OpenDBClientTest {
     }
 
     @Test
-    public void shouldSendRequest() {
+    void shouldSendRequest() {
         // Given
         int amount = 1;
         ApiResponse expectedResponse = TestUtils.createApiResponse();
@@ -47,12 +45,11 @@ public class OpenDBClientTest {
         ApiResponse response = underTest.sendRequest(amount);
 
         // Then
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(expectedResponse);
+        assertThat(response).isNotNull().isEqualTo(expectedResponse);
     }
 
     @Test
-    public void shouldGetTriviaExhaustedRetryException() {
+    void shouldGetTriviaExhaustedRetryException() {
         // Given
         int amount = 1;
         when(retryOperations.execute(any()))
