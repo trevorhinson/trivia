@@ -20,7 +20,7 @@ public class TriviaController {
 
     private TriviaService triviaService;
 
-    @PostMapping("/start")
+    @GetMapping("/gettrivia")
     public ResponseEntity<TriviaResponse> startTrivia() {
         return ResponseEntity.ok(triviaService.startTrivia());
     }

@@ -1,6 +1,5 @@
 package com.trevorhinson.tests.trivia.client;
 
-import com.trevorhinson.tests.trivia.TestUtils;
 import com.trevorhinson.tests.trivia.client.dto.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,43 +8,55 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.retry.RetryOperations;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import reactor.core.publisher.Mono;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OpenDBClientTest {
 
     @Mock
-    private RestTemplate restTemplate;
+    private WebClient.Builder webClientBuilder;
+    @Mock
+    private WebClient webClient;
+    @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    @Mock
+    private ResponseSpec responseSpec;
     @Mock
     private RetryOperations retryOperations;
-
-    private final String testUrl = "https://opentdb.com/api.php?amount=";
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpec;
 
     private OpenDBClient underTest;
 
     @BeforeEach
-    void setUp() throws Exception {
-        underTest = new OpenDBClient(restTemplate, retryOperations);
-        TestUtils.setFieldValue(underTest, "url", testUrl);
+    void setUp() {
+        when(webClientBuilder.build()).thenReturn(webClient);
+        underTest = new OpenDBClient(webClientBuilder, retryOperations);
     }
 
     @Test
-    void shouldSendRequest() {
+    void testSendRequest() {
         // Given
-        int amount = 1;
-        ApiResponse expectedResponse = TestUtils.createApiResponse();
-        when(restTemplate.getForObject(testUrl + amount, ApiResponse.class)).thenReturn(expectedResponse);
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        int amount = 10;
+        ApiResponse mockResponse = new ApiResponse();
+        when(responseSpec.bodyToMono(ApiResponse.class)).thenReturn(Mono.just(mockResponse));
 
-        // Given
+        // When
         ApiResponse response = underTest.sendRequest(amount);
 
         // Then
-        assertThat(response).isNotNull().isEqualTo(expectedResponse);
+        assertEquals(mockResponse, response);
+        verify(webClient).get();
     }
 
     @Test
@@ -59,7 +70,6 @@ class OpenDBClientTest {
         assertThatThrownBy(() -> underTest.getTrivia(amount))
                 .isInstanceOf(ExhaustedRetryException.class)
                 .hasMessageContaining("Retry attempts exhausted");
-
     }
 
 }

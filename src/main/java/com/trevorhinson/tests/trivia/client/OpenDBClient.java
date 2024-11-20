@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.RetryOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
 
@@ -17,11 +17,11 @@ public class OpenDBClient {
     @Value("${openDBClient.url}")
     private String url;
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final RetryOperations retryOperations;
 
-    public OpenDBClient(RestTemplate restTemplate, RetryOperations retryOperations) {
-        this.restTemplate = restTemplate;
+    public OpenDBClient(WebClient.Builder webClientBuilder, RetryOperations retryOperations) {
+        this.webClient = webClientBuilder.build();
         this.retryOperations = retryOperations;
     }
 
@@ -32,7 +32,11 @@ public class OpenDBClient {
     ApiResponse sendRequest(int amount) {
         String fullUrl = url + amount;
         try {
-            return restTemplate.getForObject(fullUrl, ApiResponse.class);
+            return webClient.get()
+                    .uri(fullUrl)
+                    .retrieve()
+                    .bodyToMono(ApiResponse.class)
+                    .block();
         } catch (HttpClientErrorException.Unauthorized ex) {
             log.error("Unauthorized access to OpenDB API", ex);
             throw ex;
