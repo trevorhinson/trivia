@@ -63,7 +63,7 @@ public class TriviaService {
                 }
             }
         } else {
-            log.error("Trivia not found for id: {}", id);
+            log.warn("Trivia not found for id: {}", id);
             replyResponse.setResult(NOT_FOUND.getMessage());
         }
         return replyResponse;
